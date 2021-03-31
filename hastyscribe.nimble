@@ -23,7 +23,10 @@ installExt    = @["nim", "json", "a", "css", "png", "svg", "woff", "c", "h", "in
 requires "nim >= 1.4.0"
 
 before install:
-  exec "nifty install"
+  when dirExists(thisModuleFile.parentDir / "packages"):
+    echo "packages already installed"
+  else:  
+    exec "nifty install"
 
 # Tasks
 
