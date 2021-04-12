@@ -108,16 +108,21 @@ const
   MKD_URLENCODEDANCHOR* = 0x10000000
   MKD_HTML5ANCHOR* = 0x10000000
   MKD_LATEX* = 0x40000000
+  MKD_EXPLICITLIST* = 0x80000000
   MKD_EMBED* = MKD_NOLINKS or MKD_NOIMAGE or MKD_TAGTEXT
 
 ## High Level API
 
 import 
   strutils,
-  pegs
+  pegs,
+  logging
 
 const 
-  DefaultFlags = MKD_TOC or MKD_1_COMPAT or MKD_EXTRA_FOOTNOTE or MKD_DLEXTRA or MKD_FENCEDCODE or MKD_GITHUBTAGS or MKD_HTML5ANCHOR or MKD_LATEX
+  # MKD_1_COMPAT causes EXTRA_FOOTNOTES not working propery
+  # the reference is not recognised and not converted to link
+  # and the content is not added to the document as not being referneced
+  DefaultFlags = MKD_TOC or MKD_EXTRA_FOOTNOTE or MKD_DLEXTRA or MKD_FENCEDCODE or MKD_GITHUBTAGS or MKD_HTML5ANCHOR or MKD_LATEX
 
 type TMDMetaData* = object 
   title*: string
@@ -183,6 +188,7 @@ proc md*(s: string, f = 0, data: var TMDMetadata): string =
     data.css = cstringArrayToSeq(css)[0]
   else:
     data.css = ""
+
   # Generate HTML
   var res = allocCStringArray([""])
   if mkd_document(mmiot, res) > 0:
